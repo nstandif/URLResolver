@@ -11,7 +11,10 @@ using namespace std;
 
 const int SLASH = 47;
 const int DOT   = 46;
+const int POUND = 35;
+const int QMARK = static_cast<int>('?');
 const char NUL = '\0';
+
 
 char * removeRoot(char * url) {
   const int SCHEME_LENGTH = 7;
@@ -49,13 +52,33 @@ char * resolve(char * url, char * relUrl) {
   if (static_cast<int> (*relUrl) == DOT) {
     return resolve(url, relUrl);
   } else {
-    --relUrl;
     return relUrl;
   }
 }
+void removeD(char * path) {
+if(static_cast<int>(*path) == QMARK) {
+    *path = NUL;
+ }
+ if(static_cast<int>(*path) == POUND) {
+    *path = NUL;
+ }
+ if (*path != NUL) {
+   path++;
+   removeD(path);
+ }
+}
+
+void removeDocument(char * url) {
+  char * path;
+ 
+  path = url;
+  removeD(path);
+
+  parent(url);
+}
 
 char * resolveUrl(char * url, char * relUrl) {
-  parent(url);
+  removeDocument(url);
   relUrl = resolve(url, relUrl);  
   return relUrl;
 } 
@@ -69,11 +92,9 @@ int main(int argc, char ** argv) {
   char * url;
   char * relUrl;
 
-  argv++;  
-  url = *argv;
+  url = *(argv + 1);
 
-  argv++;
-  relUrl = *argv;
+  relUrl = *(argv + 2);
 
   char * root;
   root = url;
@@ -88,6 +109,7 @@ int main(int argc, char ** argv) {
     cout << root
 	 << '/'
 	 << url
+	 << '/'
 	 << relUrl
 	 << endl;
   }
